@@ -110,7 +110,9 @@ The difference: his approach is ad-hoc prompting. Metaskills package the pattern
 
 This isn't a collection of ideas — it's a collection of patterns we actually use together.
 
-See [docs/methodology.md](docs/methodology.md) for the collaboration philosophy behind these tools.
+See:
+- [docs/methodology.md](docs/methodology.md) — collaboration philosophy behind these tools
+- [docs/skills-vs-commands.md](docs/skills-vs-commands.md) — decision guide for choosing extension types
 
 ## Roadmap
 
