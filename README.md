@@ -1,19 +1,103 @@
 # Claude Metaskills
 
-**Metaskills** are skills that help create other skills. They solve the knowledge elicitation problem — helping domain experts discover and structure what they know for Claude Code.
+> Tools that help you decide what to build — and often, what *not* to build.
 
-## The Problem
+Many people extending Claude Code ask: *"What Skill should I add?"* or *"How do I write a Skill?"*
 
-Most people who want to create a Claude Code skill face two problems:
+After lots of rounds of iteration and exploration, I've found that often the better question: *"Do I actually need one?"*
 
-1. **They don't know the format** — What's a SKILL.md? What's the frontmatter?
-2. **They don't know the decisions** — Should this be a skill or a command? Do I need reference files? What structure fits my knowledge?
+**Metaskills are skills about skills and thinking** — tools that help you build other tools, but the result is often *not* to build one.
 
-Template-based tools solve problem #1. **Metaskills solve problem #2.**
+The value isn't in producing more Claude Code extensions. It's in helping you figure out:
+
+- Do I actually need a Skill, or would a command work?
+- Do I need anything at all, or is conversation and the context I provide enough?
+- What shape does my knowledge take and how can I best share it with Claude?
+
+One goal with sharing this is to highlight what has worked for me and how I think that you can build implicit knowledge yourself. Claude Opus 4.5 is incredible at determining what is actually needed, and what knowledge or context is missing.
+
+---
+
+## The Two-Problem Frame
+
+In talking with friends and colleagues, I've found that people who want to extend Claude Code often face two problems:
+
+1. **They don't know the format** — What's a SKILL.md? What's the frontmatter? What's the format? Where do I put this?
+2. **They don't know the decisions** — Should this be a skill or a command? What structure fits my knowledge?
+
+Template-based tools solve problem #1. **Metaskills helps solve problem #2.**
+
+### Example: "I need a skill for code review"
+
+You think: *"I want Claude to automatically apply my code review standards."*
+
+You run `/skill-builder`. It asks questions:
+
+- "Walk me through how you actually do a review..."
+- "What do you look for first? What's the mental process?"
+- "Does it depend on the type of code, or is it the same every time?"
+
+Through the conversation, you realize:
+
+- Your review process is the same every time (not contextual)
+- You always run it explicitly, not automatically
+- You want to trigger it, not have Claude apply it silently
+
+**Recommendation:** A `/code-review` command, not a Skill.
+
+The interview surfaced what you actually needed — which was different from what you asked for.
+
+### The Ironic Outcome
+
+After several runs with Claude Opus, `/skill-builder` almost always recommends a **slash command** over a full skill.
+
+Most expertise fits better as a focused, reusable interview or structured output — exactly what commands excel at. Full skills shine only when you need persistent state or complex multi-turn behavior across sessions.
+
+Across all our testing, the only case where a full Skill was the right answer is an [adaptive Zork player](https://github.com/jonathanprozzi/claude-utils/tree/main/skills/zork) that Claude plays and then updates learnings, and applies those learnings from past games. This needs real state persistence — save files, accumulated learnings, Obsidian sync. That pushed this into "Skill" territory.
+
+**The metaskill works — it just prefers simplicity where possible.**
+
+---
+
+## How This Works
+
+This repo codifies patterns from real collaboration — the implicit knowledge, the questions asked pulled from experience over months of collaboration across a spectrum of projects, and the types of decisions and context that shapes good outcomes.
+
+We built these by:
+
+1. Working together on real projects over many sessions
+2. Capturing transcripts and archives of what worked
+3. Identifying patterns in our most productive collaborations
+4. Packaging those patterns as reusable commands
+
+**This is a living system.** The tools evolve as our collaboration deepens. What you see here is a snapshot of patterns we've found valuable, not a finished methodology.
+
+---
 
 ## What's Included
 
-### `/skill-builder` — The Core Metaskill
+### `/explore` — The Entry Point
+
+Collaborative discovery for new projects. This is how we start things — figuring out what we're building before jumping to implementation.
+
+```
+/explore
+    │
+    ▼
+ "What are we building?"
+ "Is there reference code to look at?"
+ "What's the riskiest assumption?"
+    │
+    ▼
+ Shared understanding emerges
+    │
+    ├── Ready to document? → /create-prd
+    └── Ready to build? → Just start
+```
+
+Light structure, conversational flow, natural next steps.
+
+### `/skill-builder` — Package Your Expertise
 
 Interviews you about your expertise, identifies patterns, recommends skill vs command, and generates the artifact.
 
@@ -24,46 +108,155 @@ You → Run /skill-builder
 ```
 
 **Features:**
+
 - Conversational interview flow (not form-filling)
 - Refinement branch — collaborate on improvements before packaging
 - Skill vs command recommendation based on your knowledge shape
-- Detection-based destination (respects your dotfiles workflow)
+- Detection-based destination (respects your `dotfiles` workflow if you have one. If not, I suggest this approach!)
 
-### Examples
+### `/create-prd` — Capture Decisions
 
-Commands and skills generated using `/skill-builder`:
+Interview-driven PRD generation with fidelity detection. Adapts depth based on how much you already know.
 
-| Example | Type | What It Does |
-|---------|------|--------------|
-| `/create-prd` | Command | Interview → structured PRD with fidelity detection |
+*Generated BY `/skill-builder` — an example of the system creating its own tools.*
+
+---
+
+## The Natural Workflow
+
+```
+/explore (or just start talking)
+       │
+       ▼
+ Collaborative discovery
+ (read reference code, discuss approaches)
+       │
+       ▼
+ "Ready to document this?"
+       │
+       ▼
+    /create-prd
+       │
+       ▼
+ Living PRD captures decisions
+       │
+       ▼
+ Build, learn, context shifts
+       │
+       ▼
+ /explore again ←───────────────────┐
+       │                            │
+       ▼                            │
+ PRD evolves with new understanding─┘
+       │
+       ├──→ Need automation? → /hook-builder (coming)
+       └──→ Need to package expertise? → /skill-builder
+```
+
+**This is cyclical, not linear.** Running `/explore` on a project with an existing PRD still surfaces tacit knowledge — the "why" behind the "what." PRDs are snapshots of current understanding, not finished specs.
+
+Human judgment between each step is the methodology. We provide structured entry points, not an automated pipeline.
+
+---
 
 ## Installation
 
 ```bash
-# Copy to your commands directory
-cp commands/skill-builder.md ~/.claude/commands/
+# Clone the repo
+git clone https://github.com/jonathanprozzi/claude-metaskills.git
+cd claude-metaskills
 
-# Or symlink for easy updates
+# Symlink commands you want
+ln -s $(pwd)/commands/explore.md ~/.claude/commands/explore.md
 ln -s $(pwd)/commands/skill-builder.md ~/.claude/commands/skill-builder.md
+ln -s $(pwd)/commands/create-prd.md ~/.claude/commands/create-prd.md
 ```
 
-## Usage
+Or copy files directly to `~/.claude/commands/`.
 
-```bash
-# In any Claude Code session
-/skill-builder
+---
+
+## How We Built This
+
+This isn't a collection of standalone prompts. It's patterns extracted from real collaboration:
+
+**The process:**
+
+1. Work on real projects together (not demos)
+2. Capture session transcripts and archives
+3. Review what worked — what questions led to clarity? what flows felt natural?
+4. Package patterns as commands
+5. Test by using them ourselves
+6. Iterate based on friction
+
+**Example:** The `/explore` command was built by reviewing a transcript where we designed a new project. We noticed the pattern: "What are we building?" → read reference code → clarify assumptions → plan emerges. That became the command structure.
+
+**The archives are the source material.** Our daily session transcripts, checkpoint exports, and handoff notes — that's where the methodology lives. The commands are just the interface.
+
+---
+
+## Progressive Disclosure
+
+Not everyone needs the same level of structure:
+
+```
+Level 0: Ad-hoc prompting
+         "Interview me about X"
+         → Zero friction, works if you have implicit knowledge
+
+Level 1: /explore
+         → Light structure, surfaces good questions
+         → Entry point for most users
+
+Level 2: /create-prd + /skill-builder
+         → Specific outputs with decision logic
+         → When you know what you want to produce
+
+Level 3: Full methodology
+         → Living docs, lenses, cross-session context
+         → Deep collaboration patterns
 ```
 
-Then answer the interview questions. The metaskill will:
-1. Understand your expertise
-2. Offer suggestions (if you want them)
-3. Recommend skill vs command
-4. Generate the artifact
-5. Save to your preferred location
+Enter at whatever level fits. The commands aren't *better* than ad-hoc prompting — they're helping surface your knowledge and can provide a process to build implicit knowledge.
 
-### For Teams
+---
 
-The skill-builder works well for capturing expertise from non-technical team members:
+## Methodology
+
+See detailed docs:
+
+- [docs/methodology.md](docs/methodology.md) — collaboration philosophy
+- [docs/skills-vs-commands.md](docs/skills-vs-commands.md) — when to use what
+
+**Core principles** (inspired by [Ethan Mollick's centaur/cyborg framing](https://www.oneusefulthing.org/p/centaurs-and-cyborgs-on-the-jagged)):
+
+- **Generative over extractive** — The conversation creates new understanding, not just captures existing knowledge
+- **Conversational over form-filling** — Interview, don't interrogate
+- **Decisions over format** — Help people figure out *what* to build
+- **Refinement over pure capture** — Collaborate, don't just record
+- **Cyclical over linear** — Return to `/explore` as understanding deepens
+
+---
+
+## Roadmap
+
+**Shipped:**
+
+- `/explore` — Collaborative discovery entry point
+- `/skill-builder` — Interview → generate skills or commands
+- `/create-prd` — Interview → structured PRD (generated by skill-builder)
+
+**In Progress** (dogfooding in dotfiles):
+
+- `/hook-builder` — Interview → generate hooks + config
+
+**The system builds itself:** `/create-prd` was generated by `/skill-builder`. Future commands will be built the same way.
+
+---
+
+## For Teams
+
+The capture → curation model works well for teams:
 
 ```
 Domain expert runs /skill-builder
@@ -75,75 +268,22 @@ Answers interview questions
 Chooses "Show me the raw files"
        │
        ▼
-Technical teammate adds to team repo
+Technical teammate reviews + adds to team repo
 ```
 
-The metaskill handles **capture**. A technical curator handles **distribution**. This keeps the process accessible while maintaining quality.
+Metaskills handle **capture**. A technical curator handles **distribution**. This keeps the process accessible while maintaining quality.
 
-## Methodology
+---
 
-The metaskills approach is **tool-agnostic**. The patterns work across platforms:
+## Differentiation
 
-- **Two-problem frame** — format vs decisions
-- **Refinement branch** — capture vs collaborate vs suggest
-- **Fidelity detection** — adapt depth to input
-- **Skill vs command logic** — based on knowledge shape signals
+**vs. [Anthropic's official skills](https://github.com/anthropics/skills):** They provide skills. We provide tools to build skills.
 
-Claude Code is the current implementation. The methodology ports to other AI coding tools.
+**vs. [Claude Code Skill Factory](https://github.com/alirezarezvani/claude-code-skill-factory):** They provide templates (format). We provide interviews (decisions).
 
-## Validation
+**vs. ad-hoc prompting:** Same spirit, but with implicit knowledge baked in. You don't need to know which questions to ask — the commands surface them.
 
-This approach is validated by how experienced Claude Code users already work. [Thariq (@trq212)](https://x.com/trq212/status/1873065033869750299), an Anthropic employee, shared a similar spec-based interview workflow (696K+ views).
-
-The difference: his approach is ad-hoc prompting. Metaskills package the pattern so anyone can access it.
-
-## Development Philosophy
-
-**This repo is a human-Claude collaboration.** These metaskills emerge from ongoing pair work between [@jonathanprozzi](https://github.com/jonathanprozzi) and Claude — not prompts written in isolation, but patterns discovered through actual collaborative sessions.
-
-**We dogfood everything.** Every metaskill here has been:
-
-1. Built and tested in personal dotfiles first
-2. Used in real work sessions (not just demos)
-3. Iterated based on actual friction points
-4. Graduated to this repo only when solid
-
-This isn't a collection of ideas — it's a collection of patterns we actually use together.
-
-See:
-- [docs/methodology.md](docs/methodology.md) — collaboration philosophy behind these tools
-- [docs/skills-vs-commands.md](docs/skills-vs-commands.md) — decision guide for choosing extension types
-
-## Roadmap
-
-**Shipped:**
-- `/skill-builder` — Interview → generate skills or commands
-
-**Planned** (dogfooding in dotfiles first):
-- `/hook-builder` — Interview → generate hooks + config
-
-**Examples** (generated BY skill-builder):
-- `/create-prd` — Interview → structured PRD with fidelity detection
-
-### The Translation Insight
-
-Metaskills are **translation layers** — they help others adopt patterns we've refined through collaboration:
-
-| Metaskill | Input | Output |
-|-----------|-------|--------|
-| `/skill-builder` | "I have expertise" | Packaged skill or command |
-| `/hook-builder` | "I want X to happen when Y" | Working hook + config |
-
-Each demystifies a different Claude Code extension point.
-
-### What's NOT in this repo
-
-Commands like `/problem-frame`, `/decision-doc`, `/retrospective` use the same methodology but don't create Claude Code extension points — they create documents. Those belong in [claude-utils](https://github.com/jonathanprozzi/claude-utils).
-
-## Related
-
-- [Anthropic Skills Repo](https://github.com/anthropics/skills) — official skills (no skill-builder)
-- [Claude Code Skill Factory](https://github.com/alirezarezvani/claude-code-skill-factory) — template-based (different approach)
+---
 
 ## License
 
@@ -151,4 +291,6 @@ MIT
 
 ---
 
-*Built by [@jonathanprozzi](https://github.com/jonathanprozzi)*
+*A living system by [@jonathanprozzi](https://github.com/jonathanprozzi) and Claude*
+
+*Patterns discovered through collaboration, packaged for others to build on.*

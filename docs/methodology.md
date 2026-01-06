@@ -4,12 +4,33 @@ This document captures the collaboration philosophy behind the metaskills in thi
 
 ## The Centaur Model
 
-These metaskills emerge from a "centaur" collaboration style:
+The "centaur" framing comes from [Ethan Mollick's research](https://www.oneusefulthing.org/p/centaurs-and-cyborgs-on-the-jagged) on AI and work. In his terminology:
 
-- **Human brings:** Domain expertise, taste, judgment, context, goals
-- **Claude brings:** Structural patterns, synthesis, gap-detection, articulation
+- **Centaurs** divide labor strategically — human handles X, AI handles Y, with a clear boundary
+- **Cyborgs** integrate deeply — intertwining work throughout, moving back and forth across tasks
+
+Our workflow is closer to **cyborg** in Mollick's terms: continuous dialogue, generative conversation, thinking *together* rather than dividing tasks. But "centaur" has become the broader umbrella term for human+AI collaboration, and we use it that way here.
+
+These metaskills emerge from that collaboration style:
+
+- **Human brings:** Domain expertise, taste, judgment, context, goals — and crucially, *tacit knowledge* that can't be prompted out directly
+- **Claude brings:** Structural patterns, synthesis, gap-detection, articulation — and the ability to *reflect back* what it's hearing so the human can correct
 
 Neither is "driving" — it's genuine pair work. The human isn't just prompting; Claude isn't just executing. We're thinking together.
+
+### Generative vs Extractive
+
+The key insight: the conversation is **generative**, not extractive. New understanding emerges from dialogue that neither party had before.
+
+This is different from requirements gathering, where you're pulling information out of someone's head. In centaur work, the questions themselves create new clarity.
+
+| Extractive | Generative |
+|------------|------------|
+| "What are the requirements?" | "What's alive for you right now?" |
+| "List the features" | "What would make this a success?" |
+| "Who's the stakeholder?" | "Why does this matter to you?" |
+
+Ask questions that invite reflection, not just recall.
 
 ## Core Principles
 
@@ -61,7 +82,37 @@ This is why our PRDs have:
 
 The document is a thinking tool, not just an artifact.
 
-### 5. The Two-Problem Frame
+### 5. Cyclical Refinement (Explore ↔ PRD)
+
+The commands aren't a waterfall. They're tools you return to:
+
+```
+/explore
+    │
+    ▼
+PRD captures current understanding
+    │
+    ▼
+Build, learn, context shifts
+    │
+    ▼
+/explore again (even on existing PRD)
+    │
+    ▼
+PRD evolves with new tacit knowledge
+    │
+    ▼
+(repeat as understanding deepens)
+```
+
+**Key insight from testing:** Running `/explore` on a project with an existing comprehensive PRD *still* surfaced tacit knowledge that wasn't captured — the "why" behind the "what," friction points, identity framing. The PRD had the decisions; explore surfaced the philosophy.
+
+This means:
+- `/explore` isn't just for new projects
+- PRDs are never "done" — they're snapshots of current understanding
+- The cycle is: explore → document → build → explore again
+
+### 6. The Two-Problem Frame
 
 Most people who want to package expertise face two problems:
 
